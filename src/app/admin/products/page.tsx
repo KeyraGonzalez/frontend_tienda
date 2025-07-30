@@ -21,6 +21,13 @@ import {
   X,
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
+import { useCloudinaryImage } from '@/hooks/useCloudinaryImage';
+
+interface CloudinaryImageData {
+  url: string;
+  publicId?: string;
+}
 
 interface Product {
   _id: string;
@@ -30,7 +37,7 @@ interface Product {
   discountPrice?: number;
   category: string;
   stock: number;
-  images: string[];
+  images: (string | CloudinaryImageData)[];
   imageUrls?: string[];
   isActive: boolean;
   rating: number;
@@ -72,55 +79,6 @@ export default function ProductsManagement() {
     tags: [],
   });
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
-  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
-
-  // Función para construir URL de imagen desde el backend
-  const getImageUrl = (imagePath: string) => {
-    if (!imagePath) return null;
-
-    // Si ya es una URL completa, devolverla tal como está
-    if (imagePath.startsWith('http')) {
-      return imagePath;
-    }
-
-    // Obtener la URL base del backend
-    const API_URL =
-      process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
-    const baseUrl = API_URL.replace('/api', ''); // Remover /api para obtener la URL base
-
-    // Si el path ya incluye 'uploads', usarlo directamente
-    if (imagePath.startsWith('uploads/')) {
-      return `${baseUrl}/${imagePath}`;
-    }
-
-    // Si el path incluye 'products/', asumir que va después de uploads
-    if (imagePath.startsWith('products/')) {
-      return `${baseUrl}/uploads/${imagePath}`;
-    }
-
-    // Si es solo el nombre del archivo, asumir que está en products
-    return `${baseUrl}/uploads/products/${imagePath}`;
-  };
-
-  // Función para generar placeholder SVG
-  const generatePlaceholderSVG = (
-    width: number,
-    height: number,
-    text: string
-  ) => {
-    const svgContent = `
-      <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100%" height="100%" fill="#f3f4f6"/>
-        <rect x="20%" y="20%" width="60%" height="60%" fill="#e5e7eb" rx="8"/>
-        <circle cx="40%" cy="35%" r="8" fill="#d1d5db"/>
-        <path d="M25% 65% L35% 55% L45% 60% L55% 50% L75% 65% Z" fill="#d1d5db"/>
-        <text x="50%" y="80%" fontFamily="Arial, sans-serif" fontSize="12" fill="#6b7280" textAnchor="middle">
-          ${text}
-        </text>
-      </svg>
-    `;
-    return `data:image/svg+xml;base64,${btoa(svgContent)}`;
-  };
 
   useEffect(() => {
     if (!isAuthenticated || user?.role !== 'admin') {
@@ -145,45 +103,26 @@ export default function ProductsManagement() {
             (product: any) =>
               product && typeof product === 'object' && product._id
           )
-          .map((product: any) => {
-            let imageUrls: string[] = [];
-
-            // Procesar las URLs de imágenes
-            if (product.imageUrls && Array.isArray(product.imageUrls)) {
-              // Si el backend ya devuelve URLs completas
-              imageUrls = product.imageUrls;
-            } else if (product.images && Array.isArray(product.images)) {
-              // Si solo tenemos paths, construir las URLs
-              imageUrls = product.images
-                .map((imagePath: string) => {
-                  const url = getImageUrl(imagePath);
-                  console.log(`Constructed URL for ${imagePath}: ${url}`); // Para debug
-                  return url;
-                })
-                .filter((url: string | null) => url !== null);
-            }
-
-            return {
-              _id: product._id || '',
-              name: product.name || 'Sin nombre',
-              description: product.description || 'Sin descripción',
-              price: Number(product.price) || 0,
-              discountPrice: product.discountPrice
-                ? Number(product.discountPrice)
-                : undefined,
-              category: product.category || 'uncategorized',
-              stock: Number(product.stock) || 0,
-              images: product.images || [],
-              imageUrls: imageUrls,
-              isActive: Boolean(product.isActive !== false),
-              rating: Number(product.rating) || 0,
-              reviewCount: Number(product.reviewCount) || 0,
-              createdAt: product.createdAt || new Date().toISOString(),
-              gender: product.gender || 'unisex',
-              sku: product.sku || '',
-              brand: product.brand || '',
-            };
-          });
+          .map((product: any) => ({
+            _id: product._id || '',
+            name: product.name || 'Sin nombre',
+            description: product.description || 'Sin descripción',
+            price: Number(product.price) || 0,
+            discountPrice: product.discountPrice
+              ? Number(product.discountPrice)
+              : undefined,
+            category: product.category || 'uncategorized',
+            stock: Number(product.stock) || 0,
+            images: product.images || [],
+            imageUrls: product.imageUrls || [],
+            isActive: Boolean(product.isActive !== false),
+            rating: Number(product.rating) || 0,
+            reviewCount: Number(product.reviewCount) || 0,
+            createdAt: product.createdAt || new Date().toISOString(),
+            gender: product.gender || 'unisex',
+            sku: product.sku || '',
+            brand: product.brand || '',
+          }));
 
         console.log('Processed products with image URLs:', validProducts);
         setProducts(validProducts);
@@ -311,11 +250,7 @@ export default function ProductsManagement() {
       const newProduct = response.product || response;
       const processedProduct = {
         ...newProduct,
-        imageUrls:
-          response.imageUrls ||
-          (newProduct.images || [])
-            .map((path: string) => getImageUrl(path))
-            .filter(Boolean),
+        imageUrls: response.imageUrls || [],
       };
 
       setProducts([...products, processedProduct]);
@@ -357,7 +292,7 @@ export default function ProductsManagement() {
       };
 
       setProducts(
-        products.map((p) =>
+        products.map((p: Product) =>
           p._id === selectedProduct._id ? updatedProduct : p
         )
       );
@@ -387,7 +322,7 @@ export default function ProductsManagement() {
   const handleToggleStatus = async (productId: string) => {
     try {
       setProducts(
-        products.map((p) =>
+        products.map((p: Product) =>
           p._id === productId ? { ...p, isActive: !p.isActive } : p
         )
       );
@@ -444,11 +379,6 @@ export default function ProductsManagement() {
     if (stock <= 10)
       return { text: 'Stock Bajo', color: 'bg-yellow-100 text-yellow-800' };
     return { text: 'En Stock', color: 'bg-green-100 text-green-800' };
-  };
-
-  const handleImageError = (imageUrl: string, productId: string) => {
-    console.log(`Image failed to load: ${imageUrl} for product ${productId}`);
-    setImageErrors((prev) => new Set(prev).add(`${productId}-${imageUrl}`));
   };
 
   if (!isAuthenticated || user?.role !== 'admin') {
@@ -570,7 +500,7 @@ export default function ProductsManagement() {
               onChange={(e) => setCategoryFilter(e.target.value)}
               className="px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
             >
-              {categories.map((category) => (
+              {categories.map((category: { value: string; label: string }) => (
                 <option key={category.value} value={category.value}>
                   {category.label}
                 </option>
@@ -604,7 +534,7 @@ export default function ProductsManagement() {
         {/* Products Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {loading ? (
-            Array.from({ length: 8 }).map((_, index) => (
+            Array.from({ length: 8 }).map((_, index: number) => (
               <Card key={index} className="p-4 animate-pulse">
                 <div className="bg-gray-300 h-48 rounded-lg mb-4"></div>
                 <div className="h-4 bg-gray-300 rounded mb-2"></div>
@@ -618,142 +548,20 @@ export default function ProductsManagement() {
               <p className="text-gray-500">No se encontraron productos</p>
             </div>
           ) : (
-            filteredProducts.map((product) => {
-              const firstImageUrl =
-                product.imageUrls && product.imageUrls.length > 0
-                  ? product.imageUrls[0]
-                  : null;
-              const hasValidImage =
-                firstImageUrl &&
-                !imageErrors.has(`${product._id}-${firstImageUrl}`);
-
-              return (
-                <Card
-                  key={product._id}
-                  className="overflow-hidden hover:shadow-lg transition-shadow"
-                >
-                  <div className="relative">
-                    <div className="h-48 bg-gradient-to-br from-gray-200 to-gray-300 overflow-hidden rounded-t-lg flex items-center justify-center">
-                      {hasValidImage ? (
-                        <img
-                          src={firstImageUrl || '/placeholder.svg'}
-                          alt={product.name || 'Producto'}
-                          className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-                          onError={() =>
-                            handleImageError(firstImageUrl, product._id)
-                          }
-                          onLoad={() => {
-                            console.log(
-                              `Image loaded successfully: ${firstImageUrl}`
-                            );
-                          }}
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <img
-                            src={generatePlaceholderSVG(
-                              200,
-                              200,
-                              product.name || 'Sin imagen'
-                            )}
-                            alt="Placeholder"
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      )}
-                    </div>
-                    <div className="absolute top-2 right-2 flex space-x-1">
-                      {!product.isActive && (
-                        <span className="px-2 py-1 bg-red-500 text-white text-xs rounded-full">
-                          Inactivo
-                        </span>
-                      )}
-                      {product.discountPrice && (
-                        <span className="px-2 py-1 bg-green-500 text-white text-xs rounded-full">
-                          Oferta
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-semibold text-gray-900 mb-2 truncate">
-                      {product.name || 'Sin nombre'}
-                    </h3>
-                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                      {product.description || 'Sin descripción'}
-                    </p>
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center space-x-2">
-                        {product.discountPrice ? (
-                          <>
-                            <span className="text-lg font-bold text-green-600">
-                              ${product.discountPrice}
-                            </span>
-                            <span className="text-sm text-gray-500 line-through">
-                              ${product.price}
-                            </span>
-                          </>
-                        ) : (
-                          <span className="text-lg font-bold text-gray-900">
-                            ${product.price || 0}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                        <span className="text-sm text-gray-600">
-                          {product.rating || 0} ({product.reviewCount || 0})
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between mb-4">
-                      <span
-                        className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                          getStockStatus(product.stock || 0).color
-                        }`}
-                      >
-                        {getStockStatus(product.stock || 0).text}
-                      </span>
-                      <span className="text-sm text-gray-600">
-                        Stock: {product.stock || 0}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <button className="text-blue-600 hover:text-blue-900 p-1 rounded">
-                          <Eye className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => openEditModal(product)}
-                          className="text-green-600 hover:text-green-900 p-1 rounded"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteProduct(product._id)}
-                          className="text-red-600 hover:text-red-900 p-1 rounded"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                      <button
-                        onClick={() => handleToggleStatus(product._id)}
-                        className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
-                          product.isActive
-                            ? 'bg-red-100 text-red-800 hover:bg-red-200'
-                            : 'bg-green-100 text-green-800 hover:bg-green-200'
-                        }`}
-                      >
-                        {product.isActive ? 'Desactivar' : 'Activar'}
-                      </button>
-                    </div>
-                  </div>
-                </Card>
-              );
-            })
+            filteredProducts.map((product: Product) => (
+              <ProductAdminCard
+                key={product._id}
+                product={product}
+                openEditModal={openEditModal}
+                handleDeleteProduct={handleDeleteProduct}
+                handleToggleStatus={handleToggleStatus}
+                getStockStatus={getStockStatus}
+              />
+            ))
           )}
         </div>
       </main>
+
 
       {/* Create Product Modal */}
       {showCreateModal && (
@@ -851,7 +659,7 @@ export default function ProductsManagement() {
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                     required
                   >
-                    {genderOptions.map((option) => (
+                    {genderOptions.map((option: { value: string; label: string }) => (
                       <option key={option.value} value={option.value}>
                         {option.label}
                       </option>
@@ -958,7 +766,7 @@ export default function ProductsManagement() {
                       {selectedImages.length} imagen(es) seleccionada(s):
                     </p>
                     <div className="grid grid-cols-3 gap-2">
-                      {selectedImages.map((file, index) => (
+                      {selectedImages.map((file: File, index: number) => (
                         <div key={index} className="relative">
                           <img
                             src={
@@ -1127,7 +935,7 @@ export default function ProductsManagement() {
                     }
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                   >
-                    {genderOptions.map((option) => (
+                    {genderOptions.map((option: { value: string; label: string }) => (
                       <option key={option.value} value={option.value}>
                         {option.label}
                       </option>
@@ -1197,3 +1005,131 @@ export default function ProductsManagement() {
     </div>
   );
 }
+
+function ProductAdminCard({
+  product,
+  openEditModal,
+  handleDeleteProduct,
+  handleToggleStatus,
+  getStockStatus,
+}: {
+  product: Product;
+  openEditModal: (product: Product) => void;
+  handleDeleteProduct: (id: string) => void;
+  handleToggleStatus: (id: string) => void;
+  getStockStatus: (stock: number) => { text: string; color: string };
+}) {
+  const firstImageData = product.images && product.images.length > 0 
+    ? product.images[0] 
+    : null;
+
+  const { imageUrl, handleImageLoad, handleImageError } = useCloudinaryImage(
+    firstImageData,
+    product.name || 'Producto'
+  );
+
+  return (
+    <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+      <div className="relative">
+        <div className="h-48 bg-gradient-to-br from-gray-200 to-gray-300 overflow-hidden rounded-t-lg flex items-center justify-center">
+          <Image
+            src={imageUrl || '/placeholder.svg'}
+            alt={product.name || 'Producto'}
+            width={200}
+            height={200}
+            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+            onError={handleImageError}
+            onLoad={handleImageLoad}
+          />
+        </div>
+        <div className="absolute top-2 right-2 flex space-x-1">
+          {!product.isActive && (
+            <span className="px-2 py-1 bg-red-500 text-white text-xs rounded-full">
+              Inactivo
+            </span>
+          )}
+          {product.discountPrice && (
+            <span className="px-2 py-1 bg-green-500 text-white text-xs rounded-full">
+              Oferta
+            </span>
+          )}
+        </div>
+      </div>
+      <div className="p-4">
+        <h3 className="font-semibold text-gray-900 mb-2 truncate">
+          {product.name || 'Sin nombre'}
+        </h3>
+        <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+          {product.description || 'Sin descripción'}
+        </p>
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center space-x-2">
+            {product.discountPrice ? (
+              <>
+                <span className="text-lg font-bold text-green-600">
+                  ${product.discountPrice}
+                </span>
+                <span className="text-sm text-gray-500 line-through">
+                  ${product.price}
+                </span>
+              </>
+            ) : (
+              <span className="text-lg font-bold text-gray-900">
+                ${product.price || 0}
+              </span>
+            )}
+          </div>
+          <div className="flex items-center space-x-1">
+            <Star className="w-4 h-4 text-yellow-400 fill-current" />
+            <span className="text-sm text-gray-600">
+              {product.rating || 0} ({product.reviewCount || 0})
+            </span>
+          </div>
+        </div>
+        <div className="flex items-center justify-between mb-4">
+          <span
+            className={`px-2 py-1 text-xs font-semibold rounded-full ${
+              getStockStatus(product.stock || 0).color
+            }`}
+          >
+            {getStockStatus(product.stock || 0).text}
+          </span>
+          <span className="text-sm text-gray-600">
+            Stock: {product.stock || 0}
+          </span>
+        </div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <button className="text-blue-600 hover:text-blue-900 p-1 rounded">
+              <Eye className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => openEditModal(product)}
+              className="text-green-600 hover:text-green-900 p-1 rounded"
+            >
+              <Edit className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => handleDeleteProduct(product._id)}
+              className="text-red-600 hover:text-red-900 p-1 rounded"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+          <button
+            onClick={() => handleToggleStatus(product._id)}
+            className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+              product.isActive
+                ? 'bg-red-100 text-red-800 hover:bg-red-200'
+                : 'bg-green-100 text-green-800 hover:bg-green-200'
+            }`}
+          >
+            {product.isActive ? 'Desactivar' : 'Activar'}
+          </button>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+   

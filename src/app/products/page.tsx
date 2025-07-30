@@ -476,7 +476,7 @@ function ProductsContent() {
                       : 'grid-cols-1'
                   }`}
                 >
-                  {data.products.map((product: any) => (
+                  {data.products.map((product: any, index: number) => (
                     <ProductCard
                       key={product._id}
                       product={product}

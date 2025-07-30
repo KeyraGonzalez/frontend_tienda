@@ -173,7 +173,7 @@ export default function RegisterPage() {
                   <ShoppingBag className="w-7 h-7 text-white group-hover:scale-110 transition-transform duration-300" />
                 </div>
                 <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  Moda Elegante
+                  Style Hub
                 </span>
               </Link>
             </div>

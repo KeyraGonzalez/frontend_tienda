@@ -10,7 +10,6 @@ import {
   ArrowLeft,
   ArrowRight,
   Heart,
-  Tag,
   Shield,
   Truck,
   Gift,
@@ -21,11 +20,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { Card } from '@/components/ui/Card';
-import { getImageUrl, generatePlaceholderSVG } from '@/components/products/ProductCard';
-
+import { useCloudinaryImage } from '@/hooks/useCloudinaryImage';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
-
 
 export default function CartPage() {
   const { cart, updateCartItem, removeFromCart, loading } = useCart();
@@ -73,9 +70,11 @@ export default function CartPage() {
       ) || 0
     );
   };
+
   const calculateTax = (subtotal: number) => {
     return subtotal * 0.1; // 10% tax
   };
+
   const calculateShipping = (subtotal: number) => {
     return subtotal > 100 ? 0 : 10; // Free shipping over $100
   };
@@ -147,6 +146,7 @@ export default function CartPage() {
           <span>/</span>
           <span className="text-gray-900 font-medium">Carrito de Compras</span>
         </nav>
+
         {/* Page Header */}
         <div className="flex items-center justify-between mb-8 animate-fade-in-up">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-800 to-blue-600 bg-clip-text text-transparent">
@@ -157,6 +157,7 @@ export default function CartPage() {
             {cart?.totalItems === 1 ? 'artículo' : 'artículos'}
           </div>
         </div>
+
         {loading ? (
           /* Loading State */
           <div className="text-center py-16 animate-fade-in-up">
@@ -201,13 +202,10 @@ export default function CartPage() {
                 const productStock = product?.stock || 0;
                 const productImages = product?.images || [];
 
-                const imageUrl =
-                  productImages.length > 0
-                    ? getImageUrl(productImages[0])
-                    : null;
-                const displayImageUrl = !imageUrl
-                  ? generatePlaceholderSVG(100, 100, productName)
-                  : imageUrl;
+                const firstImageData =
+                  productImages.length > 0 ? productImages[0] : null;
+                const { imageUrl, handleImageLoad, handleImageError } =
+                  useCloudinaryImage(firstImageData, productName);
 
                 return (
                   <Card
@@ -218,11 +216,13 @@ export default function CartPage() {
                       {/* Product Image */}
                       <div className="flex-shrink-0 w-24 h-24 bg-gray-200 rounded-lg overflow-hidden shadow-sm">
                         <Image
-                          src={displayImageUrl || '/placeholder.svg'}
+                          src={imageUrl || '/placeholder.svg'}
                           alt={productName}
                           width={96}
                           height={96}
                           className="object-cover w-full h-full"
+                          onError={handleImageError}
+                          onLoad={handleImageLoad}
                         />
                       </div>
                       {/* Product Details */}
@@ -316,6 +316,7 @@ export default function CartPage() {
                   </Card>
                 );
               })}
+
               {/* Continue Shopping */}
               <div className="pt-4">
                 <Link href="/products">
@@ -326,6 +327,7 @@ export default function CartPage() {
                 </Link>
               </div>
             </div>
+
             {/* Order Summary */}
             <div className="lg:col-span-1">
               <Card className="p-6 sticky top-8 shadow-lg">
@@ -362,6 +364,7 @@ export default function CartPage() {
                     <span>${total.toFixed(2)}</span>
                   </div>
                 </div>
+
                 {/* Free Shipping Progress */}
                 {shipping > 0 && (
                   <div className="mb-6 p-4 bg-rose-50 rounded-lg border border-rose-100">
@@ -382,6 +385,7 @@ export default function CartPage() {
                     </div>
                   </div>
                 )}
+
                 {/* Checkout Button */}
                 <Link href="/checkout">
                   <button className="w-full px-6 py-3 bg-gradient-to-r from-rose-500 to-pink-500 text-white font-medium rounded-lg hover:from-rose-600 hover:to-pink-600 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 transition-all shadow-lg group mb-4">
@@ -389,6 +393,7 @@ export default function CartPage() {
                     <ArrowRight className="w-4 h-4 ml-2 inline group-hover:translate-x-1 transition-transform" />
                   </button>
                 </Link>
+
                 {/* Security Features */}
                 <div className="space-y-3 pt-4 border-t border-gray-200">
                   <div className="flex items-center space-x-2 text-sm text-gray-600">
@@ -404,6 +409,7 @@ export default function CartPage() {
                     <span>Devoluciones gratuitas</span>
                   </div>
                 </div>
+
                 {/* Security Badge */}
                 <div className="text-center text-sm text-gray-500 mt-4 pt-4 border-t border-gray-200">
                   <div className="flex items-center justify-center space-x-1 mb-2">

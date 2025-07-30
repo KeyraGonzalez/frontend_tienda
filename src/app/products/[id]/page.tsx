@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import Image from 'next/image'; // Importar Image de Next.js
+import Image from 'next/image';
 import Link from 'next/link';
+import { useCloudinaryImages } from '@/hooks/useCloudinaryImage';
 import {
   ArrowLeft,
   Heart,
@@ -40,43 +41,10 @@ interface ProductDetailPageProps {
   };
 }
 
-// Function to construct image URL from backend path
-const getImageUrl = (imagePath: string) => {
-  if (!imagePath) return null;
-  if (imagePath.startsWith('http')) {
-    return imagePath;
-  }
-  const API_URL =
-    process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
-  const baseUrl = API_URL.replace('/api', '');
-  if (imagePath.startsWith('uploads/')) {
-    return `${baseUrl}/${imagePath}`;
-  }
-  if (imagePath.startsWith('products/')) {
-    return `${baseUrl}/uploads/${imagePath}`;
-  }
-  return `${baseUrl}/uploads/products/${imagePath}`;
-};
-
-// Function to generate placeholder SVG
-const generatePlaceholderSVG = (
-  width: number,
-  height: number,
-  text: string
-) => {
-  const svgContent = `
-    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-      <rect width="100%" height="100%" fill="#f3f4f6"/>
-      <rect x="20%" y="20%" width="60%" height="60%" fill="#e5e7eb" rx="8"/>
-      <circle cx="40%" cy="35%" r="8" fill="#d1d5db"/>
-      <path d="M25% 65% L35% 55% L45% 60% L55% 50% L75% 65% Z" fill="#d1d5db"/>
-      <text x="50%" y="80%" fontFamily="Arial, sans-serif" fontSize="12" fill="#6b7280" textAnchor="middle">
-        ${text}
-      </text>
-    </svg>
-  `;
-  return `data:image/svg+xml;base64,${btoa(svgContent)}`;
-};
+interface CloudinaryImageData {
+  url: string;
+  publicId?: string;
+}
 
 export default function ProductDetailPage({ params }: ProductDetailPageProps) {
   const { addToCart, loading: cartLoading } = useCart();
@@ -86,10 +54,6 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [mainImageError, setMainImageError] = useState(false);
-  const [thumbnailErrors, setThumbnailErrors] = useState<Set<number>>(
-    new Set()
-  );
 
   const {
     data: product,
@@ -99,6 +63,11 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
     queryKey: ['product', params.id],
     queryFn: () => productsApi.getProduct(params.id),
   });
+
+  // Handle Cloudinary images
+  const imagesData = product?.images || [];
+  const { getImageUrl, handleImageLoad, handleImageError } =
+    useCloudinaryImages(imagesData, product?.name || 'Producto');
 
   const handleAddToCart = async () => {
     if (!isAuthenticated) {
@@ -207,11 +176,10 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
 
   const discount = calculateDiscount();
 
-  const mainDisplayImageUrl = mainImageError
-    ? generatePlaceholderSVG(600, 600, product.name || 'No Image')
-    : product.imageUrls?.[activeImageIndex] ||
-      getImageUrl(product.images?.[activeImageIndex] || '') ||
-      generatePlaceholderSVG(600, 600, product.name || 'No Image');
+  const mainDisplayImageUrl = getImageUrl(
+    imagesData[activeImageIndex] || null,
+    activeImageIndex
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
@@ -257,8 +225,8 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
                 width={600}
                 height={600}
                 className="object-cover w-full h-full"
-                onError={() => setMainImageError(true)}
-                onLoad={() => setMainImageError(false)}
+                onError={() => handleImageError(activeImageIndex)}
+                onLoad={() => handleImageLoad(activeImageIndex)}
               />
               {/* Image Overlay Effects */}
               <div className="absolute top-4 right-4 flex space-x-2">
@@ -275,46 +243,34 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
               </div>
             </div>
             {/* Thumbnail Images */}
-            {product.images && product.images.length > 1 && (
+            {imagesData && imagesData.length > 1 && (
               <div className="grid grid-cols-4 gap-3">
-                {product.images.map((imagePath: string, index: number) => {
-                  const thumbnailUrl = thumbnailErrors.has(index)
-                    ? generatePlaceholderSVG(100, 100, `Thumb ${index + 1}`)
-                    : getImageUrl(imagePath) ||
-                      generatePlaceholderSVG(100, 100, `Thumb ${index + 1}`);
-                  return (
-                    <button
-                      key={index}
-                      onClick={() => {
-                        setActiveImageIndex(index);
-                        setMainImageError(false); // Reset main image error when changing thumbnail
-                      }}
-                      className={`aspect-square bg-white/90 backdrop-blur-sm rounded-xl overflow-hidden border-2 transition-all duration-300 shadow-md hover:shadow-lg ${
-                        activeImageIndex === index
-                          ? 'border-blue-500 ring-2 ring-blue-200 scale-105'
-                          : 'border-slate-200 hover:border-blue-300 hover:bg-blue-50 hover:scale-105'
-                      }`}
-                    >
-                      <Image
-                        src={thumbnailUrl || '/placeholder.svg'}
-                        alt={`Thumbnail ${index + 1}`}
-                        width={100}
-                        height={100}
-                        className="w-full h-full object-cover"
-                        onError={() =>
-                          setThumbnailErrors((prev) => new Set(prev).add(index))
-                        }
-                        onLoad={() =>
-                          setThumbnailErrors((prev) => {
-                            const newSet = new Set(prev);
-                            newSet.delete(index);
-                            return newSet;
-                          })
-                        }
-                      />
-                    </button>
-                  );
-                })}
+                {imagesData.map(
+                  (imageData: string | CloudinaryImageData, index: number) => {
+                    const thumbnailUrl = getImageUrl(imageData, index);
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => setActiveImageIndex(index)}
+                        className={`aspect-square bg-white/90 backdrop-blur-sm rounded-xl overflow-hidden border-2 transition-all duration-300 shadow-md hover:shadow-lg ${
+                          activeImageIndex === index
+                            ? 'border-blue-500 ring-2 ring-blue-200 scale-105'
+                            : 'border-slate-200 hover:border-blue-300 hover:bg-blue-50 hover:scale-105'
+                        }`}
+                      >
+                        <Image
+                          src={thumbnailUrl || '/placeholder.svg'}
+                          alt={`Thumbnail ${index + 1}`}
+                          width={100}
+                          height={100}
+                          className="w-full h-full object-cover"
+                          onError={() => handleImageError(index)}
+                          onLoad={() => handleImageLoad(index)}
+                        />
+                      </button>
+                    );
+                  }
+                )}
               </div>
             )}
           </div>

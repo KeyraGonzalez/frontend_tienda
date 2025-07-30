@@ -239,7 +239,7 @@ const productsApi = {
   removeProductImage: async (
     token: string,
     productId: string,
-    imagePath: string
+    publicId: string
   ) => {
     const response = await axios.delete(
       `${API_URL}/products/${productId}/images`,
@@ -249,7 +249,7 @@ const productsApi = {
           'Content-Type': 'application/json',
         },
         data: {
-          imagePath,
+          publicId,
         },
       }
     );
