@@ -70,26 +70,9 @@ export function Header() {
           {/* Right Side Actions */}
           <div className="flex items-center space-x-2">
             {/* Mobile Search */}
-            <button className="lg:hidden p-2 text-slate-500 hover:text-blue-500 transition-colors rounded-lg hover:bg-blue-50">
+            <Button className="lg:hidden p-2 text-slate-500 hover:text-blue-500 transition-colors rounded-lg hover:bg-blue-50">
               <Search className="w-5 h-5" />
-            </button>
-
-            {/* Wishlist */}
-            {isAuthenticated && (
-              <Link
-                href="/wishlist"
-                className="p-2 text-slate-500 hover:text-blue-500 transition-colors relative rounded-lg hover:bg-blue-50"
-              >
-                <Heart className="w-5 h-5" />
-                <Badge
-                  variant="error"
-                  size="sm"
-                  className="absolute -top-1 -right-1 min-w-[1.25rem] h-5 flex items-center justify-center text-xs bg-blue-500 text-white"
-                >
-                  3
-                </Badge>
-              </Link>
-            )}
+            </Button>
 
             {/* Notifications */}
             {isAuthenticated && <NotificationBell />}

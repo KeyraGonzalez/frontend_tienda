@@ -129,23 +129,7 @@ export default function LoginPage() {
               ))}
             </div>
 
-            {/* Demo Users */}
-            <div className="p-4 bg-white/40 backdrop-blur-sm rounded-xl border border-blue-200/50">
-              <h3 className="text-sm font-semibold text-gray-700 mb-3">
-                Usuarios de prueba:
-              </h3>
-              <div className="space-y-2 text-xs text-gray-600">
-                <div>
-                  👤 <strong>Cliente:</strong> customer@demo.com
-                </div>
-                <div>
-                  🛡️ <strong>Admin:</strong> admin@demo.com
-                </div>
-                <div>
-                  🔑 <strong>Contraseña:</strong> password123
-                </div>
-              </div>
-            </div>
+            
           </div>
         </div>
 
@@ -297,25 +281,9 @@ export default function LoginPage() {
                   </div>
                 </div>
 
-                <div
-                  className="grid grid-cols-2 gap-3 animate-fade-in-up"
-                  style={{ animationDelay: '1s' }}
-                >
-                  <button
-                    type="button"
-                    className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 hover:scale-105 transition-all duration-300"
-                  >
-                    <span className="text-lg mr-2">🔍</span>
-                    Google
-                  </button>
-                  <button
-                    type="button"
-                    className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 hover:scale-105 transition-all duration-300"
-                  >
-                    <span className="text-lg mr-2">📘</span>
-                    Facebook
-                  </button>
-                </div>
+                
+               
+               
               </form>
             </Card>
 

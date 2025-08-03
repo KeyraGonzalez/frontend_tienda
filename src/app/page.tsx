@@ -36,7 +36,7 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen bg-white">
       <Header />
 
       <main className="relative">
@@ -47,23 +47,32 @@ export default function HomePage() {
         <section className="py-12 md:py-16 bg-white/80 backdrop-blur-sm border-y border-blue-200/30">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              {stats.map((stat, index) => (
-                <div
-                  key={index}
-                  className="text-center group animate-fade-in-up"
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                  <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl mb-3 group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                    <stat.icon className="w-6 h-6 text-white" />
+              {stats.map((stat, index) => {
+                const delayClass =
+                  index === 0
+                    ? ''
+                    : index === 1
+                    ? 'animation-delay-100'
+                    : index === 2
+                    ? 'animation-delay-200'
+                    : 'animation-delay-300';
+                return (
+                  <div
+                    key={index}
+                    className={`text-center group animate-fade-in-up ${delayClass}`}
+                  >
+                    <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl mb-3 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                      <stat.icon className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="text-2xl md:text-3xl font-bold text-gray-800 mb-1">
+                      {stat.number}
+                    </div>
+                    <div className="text-sm text-gray-600 font-medium">
+                      {stat.label}
+                    </div>
                   </div>
-                  <div className="text-2xl md:text-3xl font-bold text-gray-800 mb-1">
-                    {stat.number}
-                  </div>
-                  <div className="text-sm text-gray-600 font-medium">
-                    {stat.label}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>
@@ -72,14 +81,8 @@ export default function HomePage() {
         <section className="py-16 md:py-20 bg-gradient-to-br from-blue-50 via-indigo-50/30 to-purple-50/30 relative">
           {/* Decorative Elements */}
           <div className="absolute top-10 left-10 w-32 h-32 bg-blue-200/20 rounded-full blur-3xl animate-pulse" />
-          <div
-            className="absolute bottom-20 right-20 w-40 h-40 bg-purple-200/20 rounded-full blur-3xl animate-pulse"
-            style={{ animationDelay: '1s' }}
-          />
-          <div
-            className="absolute top-1/2 left-1/2 w-24 h-24 bg-indigo-200/20 rounded-full blur-2xl animate-pulse"
-            style={{ animationDelay: '2s' }}
-          />
+          <div className="absolute bottom-20 right-20 w-40 h-40 bg-purple-200/20 rounded-full blur-3xl animate-pulse animation-delay-1000" />
+          <div className="absolute top-1/2 left-1/2 w-24 h-24 bg-indigo-200/20 rounded-full blur-2xl animate-pulse animation-delay-200" />
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
             <div className="text-center mb-12 md:mb-16 animate-fade-in-up">
@@ -103,10 +106,7 @@ export default function HomePage() {
                 </p>
               </div>
             ) : (
-              <div
-                className="relative animate-fade-in-up"
-                style={{ animationDelay: '0.3s' }}
-              >
+              <div className="relative animate-fade-in-up animation-delay-300">
                 <FeaturedProducts products={featuredProducts || []} />
 
                 {/* Gradient Overlay for Visual Appeal */}
@@ -146,10 +146,7 @@ export default function HomePage() {
                 </p>
               </div>
 
-              <div
-                className="text-center group p-8 rounded-2xl bg-white/80 backdrop-blur-sm border border-blue-200/50 hover:shadow-xl hover:bg-blue-50/30 transition-all duration-500 hover:scale-105 animate-fade-in-up"
-                style={{ animationDelay: '0.1s' }}
-              >
+              <div className="text-center group p-8 rounded-2xl bg-white/80 backdrop-blur-sm border border-blue-200/50 hover:shadow-xl hover:bg-blue-50/30 transition-all duration-500 hover:scale-105 animate-fade-in-up animation-delay-100">
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
                   <Shield className="w-8 h-8 text-white" />
                 </div>
@@ -162,10 +159,7 @@ export default function HomePage() {
                 </p>
               </div>
 
-              <div
-                className="text-center group p-8 rounded-2xl bg-white/80 backdrop-blur-sm border border-blue-200/50 hover:shadow-xl hover:bg-blue-50/30 transition-all duration-500 hover:scale-105 animate-fade-in-up sm:col-span-2 lg:col-span-1"
-                style={{ animationDelay: '0.2s' }}
-              >
+              <div className="text-center group p-8 rounded-2xl bg-white/80 backdrop-blur-sm border border-blue-200/50 hover:shadow-xl hover:bg-blue-50/30 transition-all duration-500 hover:scale-105 animate-fade-in-up animation-delay-200 sm:col-span-2 lg:col-span-1">
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
                   <Heart className="w-8 h-8 text-white" />
                 </div>
@@ -185,12 +179,7 @@ export default function HomePage() {
         <section className="py-16 md:py-20 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 relative overflow-hidden">
           {/* Background Pattern */}
           <div className="absolute inset-0 opacity-10">
-            <div
-              className="absolute top-0 left-0 w-full h-full"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-              }}
-            ></div>
+            <div className="absolute top-0 left-0 w-full h-full newsletter-pattern"></div>
           </div>
 
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">

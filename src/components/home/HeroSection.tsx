@@ -12,11 +12,10 @@ const heroSlides = [
     subtitle: 'Descubre las Últimas Tendencias',
     description:
       'Abraza la nueva temporada con nuestra exclusiva colección de primavera, diseñada con telas premium y colores vibrantes que definen el estilo contemporáneo.',
-    image: '/hero-1.jpg',
+    image: '/16485655550746.jpg',
     cta: 'Explorar Colección',
     link: '/products?category=new-arrivals',
     badge: 'Nueva Llegada',
-    gradient: 'from-blue-600 to-indigo-600',
   },
   {
     id: 2,
@@ -24,11 +23,10 @@ const heroSlides = [
     subtitle: 'Diseñado para la Sofisticación',
     description:
       'Experimenta la perfecta fusión entre elegancia clásica y diseño moderno con piezas cuidadosamente seleccionadas para cada ocasión especial.',
-    image: '/hero-2.jpg',
+    image: '/imagen-04.jpeg',
     cta: 'Ver Elegancia',
     link: '/products?category=elegant',
     badge: 'Más Vendido',
-    gradient: 'from-indigo-600 to-purple-600',
   },
   {
     id: 3,
@@ -36,11 +34,21 @@ const heroSlides = [
     subtitle: 'Completa tu Estilo Único',
     description:
       'Desde joyería artesanal hasta bolsos de diseñador, descubre los accesorios perfectos que elevan tu look y expresan tu personalidad.',
-    image: '/hero-3.jpg',
+    image: '/imagen-2.jpg',
     cta: 'Descubrir Accesorios',
     link: '/products?category=accessories',
     badge: 'Tendencia',
-    gradient: 'from-purple-600 to-pink-600',
+  },
+  {
+    id: 4,
+    title: 'Estilo Único',
+    subtitle: 'Para Ocasiones Especiales',
+    description:
+      'Encuentra las piezas perfectas que reflejan tu personalidad única y te hacen sentir especial en cada momento.',
+    image: '/imagen-3.png',
+    cta: 'Explorar Estilo',
+    link: '/products?category=unique',
+    badge: 'Exclusivo',
   },
 ];
 
@@ -85,22 +93,20 @@ export function HeroSection() {
             index === currentSlide ? 'opacity-100' : 'opacity-0'
           }`}
         >
-          {/* Dynamic Background Gradient */}
+          {/* Background Image */}
           <div
-            className={`absolute inset-0 bg-gradient-to-r ${slide.gradient}/20`}
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: `url(${slide.image})` }}
           />
-          <div className="absolute inset-0 bg-slate-800/10" />
+
+          {/* Overlay for better text readability */}
+          <div className="absolute inset-0 bg-black/40" />
+
 
           {/* Animated Background Elements */}
           <div className="absolute top-20 right-20 w-72 h-72 bg-blue-300/10 rounded-full blur-3xl animate-float" />
-          <div
-            className="absolute bottom-20 left-20 w-96 h-96 bg-purple-300/10 rounded-full blur-3xl animate-float"
-            style={{ animationDelay: '2s' }}
-          />
-          <div
-            className="absolute top-1/2 left-1/2 w-48 h-48 bg-indigo-300/10 rounded-full blur-2xl animate-float"
-            style={{ animationDelay: '1s' }}
-          />
+          <div className="absolute bottom-20 left-20 w-96 h-96 bg-purple-300/10 rounded-full blur-3xl animate-float animation-delay-2000" />
+          <div className="absolute top-1/2 left-1/2 w-48 h-48 bg-indigo-300/10 rounded-full blur-2xl animate-float animation-delay-1000" />
         </div>
       ))}
 
@@ -121,7 +127,7 @@ export function HeroSection() {
                   <>
                     {/* Badge */}
                     <div className="inline-flex items-center space-x-2 mb-4 sm:mb-6 animate-fade-in-up">
-                      <div className="flex items-center space-x-1 bg-white/40 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg border border-blue-200/30">
+                      <div className="flex items-center space-x-1 bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg border border-white/30">
                         <Star className="w-4 h-4 text-blue-500 fill-current" />
                         <span className="text-slate-700 text-sm font-semibold">
                           {slide.badge}
@@ -130,38 +136,25 @@ export function HeroSection() {
                     </div>
 
                     {/* Title */}
-                    <h1
-                      className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold bg-gradient-to-r from-slate-800 to-blue-600 bg-clip-text text-transparent mb-4 leading-tight animate-fade-in-up"
-                      style={{ animationDelay: '0.2s' }}
-                    >
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-4 leading-tight animate-fade-in-up animation-delay-200 drop-shadow-lg">
                       {slide.title}
                     </h1>
 
                     {/* Subtitle */}
-                    <h2
-                      className="text-lg sm:text-xl md:text-2xl text-slate-600 font-medium mb-4 sm:mb-6 animate-fade-in-up"
-                      style={{ animationDelay: '0.4s' }}
-                    >
+                    <h2 className="text-lg sm:text-xl md:text-2xl text-white/90 font-medium mb-4 sm:mb-6 animate-fade-in-up animation-delay-400 drop-shadow-md">
                       {slide.subtitle}
                     </h2>
 
                     {/* Description */}
-                    <p
-                      className="text-base sm:text-lg text-slate-600 mb-6 sm:mb-8 leading-relaxed max-w-2xl animate-fade-in-up"
-                      style={{ animationDelay: '0.6s' }}
-                    >
+                    <p className="text-base sm:text-lg text-white/80 mb-6 sm:mb-8 leading-relaxed max-w-2xl animate-fade-in-up animation-delay-600 drop-shadow-md">
                       {slide.description}
                     </p>
 
                     {/* CTA Buttons */}
-                    <div
-                      className="flex flex-col sm:flex-row gap-3 sm:gap-4 animate-fade-in-up"
-                      style={{ animationDelay: '0.8s' }}
-                    >
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 animate-fade-in-up animation-delay-800">
                       <Link href={slide.link} className="w-full sm:w-auto">
                         <Button
                           size="lg"
-                          className={`group w-full sm:w-auto bg-gradient-to-r ${slide.gradient} hover:shadow-xl text-white shadow-lg transform hover:scale-105 transition-all duration-300`}
                         >
                           {slide.cta}
                           <ChevronRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />

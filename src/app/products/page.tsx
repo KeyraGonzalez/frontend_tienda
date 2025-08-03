@@ -120,14 +120,18 @@ function ProductsContent() {
       <Header />
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white relative overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 main-image-bg" />
+
+        {/* Overlay for better text readability */}
+        <div className="absolute inset-0 bg-black/50" />
+
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/30 via-indigo-600/30 to-purple-600/30" />
+
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
-          <div
-            className="absolute top-0 left-0 w-full h-full"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-            }}
-          ></div>
+          <div className="absolute top-0 left-0 w-full h-full newsletter-pattern"></div>
         </div>
         <div className="container-custom py-16 relative">
           <div className="text-center animate-fade-in-up">
@@ -232,6 +236,7 @@ function ProductsContent() {
               {/* Sort Dropdown */}
               <div className="relative">
                 <select
+                  aria-label="Ordenar productos"
                   value={`${filters.sortBy}-${filters.sortOrder}`}
                   onChange={(e) => {
                     const [sortBy, sortOrder] = e.target.value.split('-');
@@ -306,12 +311,12 @@ function ProductsContent() {
                 className="flex items-center space-x-1 bg-blue-100 text-blue-800 border-blue-200"
               >
                 <span>Categoría: {filters.category}</span>
-                <button
+                <Button
                   onClick={() => handleFilterChange({ category: undefined })}
                   className="ml-1 hover:text-red-500 transition-colors"
                 >
                   <X className="w-3 h-3" />
-                </button>
+                </Button>
               </Badge>
             )}
             {filters.gender && (
@@ -320,12 +325,12 @@ function ProductsContent() {
                 className="flex items-center space-x-1 bg-purple-100 text-purple-800 border-purple-200"
               >
                 <span>Género: {filters.gender}</span>
-                <button
+                <Button
                   onClick={() => handleFilterChange({ gender: undefined })}
                   className="ml-1 hover:text-red-500 transition-colors"
                 >
                   <X className="w-3 h-3" />
-                </button>
+                </Button>
               </Badge>
             )}
             {(filters.minPrice || filters.maxPrice) && (
@@ -336,7 +341,7 @@ function ProductsContent() {
                 <span>
                   Precio: ${filters.minPrice || 0} - ${filters.maxPrice || '∞'}
                 </span>
-                <button
+                <Button
                   onClick={() =>
                     handleFilterChange({
                       minPrice: undefined,
@@ -346,7 +351,7 @@ function ProductsContent() {
                   className="ml-1 hover:text-red-500 transition-colors"
                 >
                   <X className="w-3 h-3" />
-                </button>
+                </Button>
               </Badge>
             )}
             {filters.size && (
@@ -355,12 +360,12 @@ function ProductsContent() {
                 className="flex items-center space-x-1 bg-orange-100 text-orange-800 border-orange-200"
               >
                 <span>Talla: {filters.size}</span>
-                <button
+                <Button
                   onClick={() => handleFilterChange({ size: undefined })}
                   className="ml-1 hover:text-red-500 transition-colors"
                 >
                   <X className="w-3 h-3" />
-                </button>
+                </Button>
               </Badge>
             )}
             {filters.color && (
@@ -369,12 +374,12 @@ function ProductsContent() {
                 className="flex items-center space-x-1 bg-pink-100 text-pink-800 border-pink-200"
               >
                 <span>Color: {filters.color}</span>
-                <button
+                <Button
                   onClick={() => handleFilterChange({ color: undefined })}
                   className="ml-1 hover:text-red-500 transition-colors"
                 >
                   <X className="w-3 h-3" />
-                </button>
+                </Button>
               </Badge>
             )}
             {filters.brand && (
@@ -383,12 +388,12 @@ function ProductsContent() {
                 className="flex items-center space-x-1 bg-indigo-100 text-indigo-800 border-indigo-200"
               >
                 <span>Marca: {filters.brand}</span>
-                <button
+                <Button
                   onClick={() => handleFilterChange({ brand: undefined })}
                   className="ml-1 hover:text-red-500 transition-colors"
                 >
                   <X className="w-3 h-3" />
-                </button>
+                </Button>
               </Badge>
             )}
             <Button

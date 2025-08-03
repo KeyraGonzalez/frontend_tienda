@@ -19,26 +19,9 @@ export function Footer() {
   const footerLinks = {
     shop: [
       { name: 'Productos', href: '/products' },
-      { name: 'Ofertas', href: '/products?sale=true' },
-      { name: 'Categorías', href: '/categories' },
-    ],
-    support: [
-      { name: 'Contáctanos', href: '/contact' },
-      { name: 'Envíos', href: '/shipping' },
-      { name: 'Devoluciones', href: '/returns' },
-      { name: 'FAQ', href: '/faq' },
-    ],
-    legal: [
-      { name: 'Privacidad', href: '/privacy' },
-      { name: 'Términos', href: '/terms' },
     ],
   };
 
-  const socialLinks = [
-    { name: 'Facebook', href: '#', icon: Facebook },
-    { name: 'Twitter', href: '#', icon: Twitter },
-    { name: 'Instagram', href: '#', icon: Instagram },
-  ];
 
   const features = [
     {
@@ -131,21 +114,7 @@ export function Footer() {
             </ul>
           </div>
 
-          <div>
-            <h3 className="font-semibold text-slate-200 mb-4">Soporte</h3>
-            <ul className="space-y-2">
-              {footerLinks.support.map((link) => (
-                <li key={link.name}>
-                  <Link
-                    href={link.href}
-                    className="text-slate-400 hover:text-blue-400 transition-colors duration-200"
-                  >
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+         
         </div>
       </div>
 
@@ -157,19 +126,6 @@ export function Footer() {
               © {currentYear} Moda Elegante. Todos los derechos reservados.
             </div>
 
-            {/* Social Links */}
-            <div className="flex items-center space-x-3">
-              {socialLinks.map((social) => (
-                <Link
-                  key={social.name}
-                  href={social.href}
-                  className="w-8 h-8 bg-slate-700 rounded-lg flex items-center justify-center text-slate-400 hover:text-blue-400 hover:bg-slate-600 transition-all duration-200"
-                  aria-label={social.name}
-                >
-                  <social.icon className="w-4 h-4" />
-                </Link>
-              ))}
-            </div>
           </div>
         </div>
       </div>
