@@ -99,6 +99,11 @@ const ordersApi = {
     return response.data.data;
   },
 
+  // Alias para consistencia con otras APIs
+  getById: async (token: string, orderId: string) => {
+    return ordersApi.getOrder(token, orderId);
+  },
+
   cancelOrder: async (token: string, orderId: string) => {
     const response = await axios.delete(`${API_URL}/orders/${orderId}/cancel`, {
       headers: {
