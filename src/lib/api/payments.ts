@@ -142,6 +142,16 @@ const paymentsApi = {
     );
     return response.data.data;
   },
+
+  // Método para obtener un pago por ID
+  getById: async (token: string, paymentId: string) => {
+    const response = await axios.get(`${API_URL}/payments/${paymentId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data.data;
+  },
 };
 
 export { paymentsApi };
