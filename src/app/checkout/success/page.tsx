@@ -65,11 +65,27 @@ function CheckoutSuccessPageContent() {
 
     const fetchOrderAndPaymentDetails = async () => {
       try {
-        const orderId = searchParams.get('orderId');
+        // Intentar obtener el orderId de diferentes formas posibles
+        const orderId =
+          searchParams.get('orderId') || searchParams.get('order_id'); // Removemos session_id de aquí
+
         const paymentId = searchParams.get('paymentId');
+        const sessionId = searchParams.get('session_id');
+
+        console.log('URL Parameters:', {
+          orderId: searchParams.get('orderId'),
+          order_id: searchParams.get('order_id'),
+          session_id: searchParams.get('session_id'),
+          paymentId: searchParams.get('paymentId'),
+          allParams: Object.fromEntries(searchParams.entries()),
+        });
 
         if (!orderId) {
-          setError('ID de orden no encontrado');
+          setError(
+            `ID de orden no encontrado en la URL. Parámetros recibidos: ${JSON.stringify(
+              Object.fromEntries(searchParams.entries())
+            )}`
+          );
           return;
         }
 
@@ -83,14 +99,16 @@ function CheckoutSuccessPageContent() {
         const orderResponse = await ordersApi.getById(token, orderId);
         setOrderDetails(orderResponse);
 
-        // Obtener detalles del pago si hay paymentId
-        if (paymentId) {
-          try {
-            const paymentResponse = await paymentsApi.getById(token, paymentId);
-            setPaymentDetails(paymentResponse);
-          } catch (paymentError) {
-            console.error('Error al obtener detalles del pago:', paymentError);
-          }
+        // Obtener detalles del pago usando el orderId (no paymentId)
+        try {
+          const paymentResponse = await paymentsApi.getPaymentByOrder(
+            token,
+            orderId // Usar orderId, no paymentId
+          );
+          setPaymentDetails(paymentResponse);
+        } catch (paymentError) {
+          console.error('Error al obtener detalles del pago:', paymentError);
+          // No es crítico si no se pueden obtener los detalles del pago
         }
 
         // Limpiar el carrito después de una compra exitosa
@@ -128,16 +146,38 @@ function CheckoutSuccessPageContent() {
   }
 
   if (error || !orderDetails) {
+    const debugInfo = {
+      currentURL: typeof window !== 'undefined' ? window.location.href : 'N/A',
+      searchParams: mounted ? Object.fromEntries(searchParams.entries()) : {},
+      hasToken: !!token,
+      hasUser: !!user,
+      error: error,
+    };
+
     return (
       <div className="min-h-screen bg-gray-50">
         <Header />
         <div className="container mx-auto px-4 py-16 text-center">
-          <div className="max-w-md mx-auto">
+          <div className="max-w-2xl mx-auto">
             <div className="text-red-500 text-6xl mb-4">⚠️</div>
             <h1 className="text-2xl font-bold text-gray-900 mb-4">Error</h1>
-            <p className="text-gray-600 mb-8">
+            <p className="text-gray-600 mb-4">
               {error || 'No se pudieron cargar los detalles de la orden'}
             </p>
+
+            {/* Información de debug */}
+            <div className="bg-gray-100 p-4 rounded-lg mb-6 text-left">
+              <h3 className="font-semibold mb-2">Información de Debug:</h3>
+              <pre className="text-xs overflow-auto">
+                {JSON.stringify(debugInfo, null, 2)}
+              </pre>
+            </div>
+
+            <p className="text-sm text-gray-500 mb-8">
+              Para acceder a esta página necesitas venir desde el proceso de
+              pago con los parámetros correctos.
+            </p>
+
             <Link
               href="/"
               className="inline-flex items-center bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
