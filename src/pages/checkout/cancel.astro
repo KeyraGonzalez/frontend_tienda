@@ -1,0 +1,57 @@
+---
+title: "Payment Cancelled"
+layout: "../../layouts/Layout.astro"
+---
+
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
+    <div class="text-center">
+      <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+        <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </div>
+      
+      <h1 class="text-3xl font-bold text-gray-900 mb-4">Pago Cancelado</h1>
+      <p class="text-lg text-gray-600 mb-6">Tu pago ha sido cancelado. No se ha realizado ningún cargo.</p>
+      
+      <div id="order-details" class="bg-gray-50 p-4 rounded-lg mb-6">
+        <h2 class="text-lg font-semibold mb-2">Tu orden sigue disponible</h2>
+        <div id="order-info">Puedes continuar con el proceso de pago cuando estés listo.</div>
+      </div>
+      
+      <div class="space-y-4">
+        <a href="/checkout" class="inline-block bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition">
+          Intentar de Nuevo
+        </a>
+        <br>
+        <a href="/carrito" class="inline-block text-blue-600 hover:text-blue-800 transition">
+          Volver al Carrito
+        </a>
+        <br>
+        <a href="/productos" class="inline-block text-gray-600 hover:text-gray-800 transition">
+          Continuar Comprando
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Obtener detalles de la orden desde la URL
+document.addEventListener('DOMContentLoaded', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const orderId = urlParams.get('order');
+
+  if (orderId) {
+    const orderInfoElement = document.getElementById('order-info');
+    if (orderInfoElement) {
+      orderInfoElement.innerHTML = `
+        <p><strong>ID de Orden:</strong> ${orderId}</p>
+        <p class="text-yellow-600 font-semibold">Estado: Pendiente de Pago</p>
+        <p class="text-sm text-gray-500 mt-2">Tu orden se mantendrá reservada por 30 minutos.</p>
+      `;
+    }
+  }
+});
+</script>

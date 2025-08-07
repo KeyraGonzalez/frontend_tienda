@@ -1,0 +1,145 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+---
+
+<Layout 
+  title="Pago PayPal Exitoso - StyleHub"
+  description="Tu pago con PayPal ha sido procesado exitosamente."
+>
+  <Header />
+  
+  <main class="min-h-screen bg-gray-50">
+    <!-- Loading State -->
+    <div id="processing" class="flex items-center justify-center min-h-screen">
+      <div class="text-center max-w-md mx-auto px-4">
+        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        </div>
+        <h1 class="text-2xl font-bold text-black mb-2 tracking-wide uppercase">PROCESANDO PAGO</h1>
+        <p class="text-gray-600 font-medium">Estamos confirmando tu pago con PayPal...</p>
+      </div>
+    </div>
+
+    <!-- Success State -->
+    <div id="success" class="hidden">
+      <div class="flex items-center justify-center min-h-screen">
+        <div class="text-center max-w-md mx-auto px-4">
+          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h1 class="text-2xl font-bold text-black mb-2 tracking-wide uppercase">¡PAGO EXITOSO!</h1>
+          <p class="text-gray-600 mb-6 font-medium">Tu pago con PayPal ha sido procesado correctamente.</p>
+          <div id="order-details" class="bg-white p-4 rounded-lg border border-gray-200 mb-6 text-left">
+            <h3 class="font-bold text-black mb-2 tracking-wide uppercase">DETALLES DEL PEDIDO</h3>
+            <div id="order-info">
+              <!-- Order details will be inserted here -->
+            </div>
+          </div>
+          <div class="space-y-3">
+            <a href="/mis-pedidos" class="block w-full bg-black text-white px-6 py-3 rounded-lg font-bold hover:bg-gray-800 transition-colors tracking-wide uppercase">
+              Ver Mis Pedidos
+            </a>
+            <a href="/productos" class="block w-full border-2 border-black text-black px-6 py-3 rounded-lg font-bold hover:bg-black hover:text-white transition-colors tracking-wide uppercase">
+              Seguir Comprando
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div id="error" class="hidden">
+      <div class="flex items-center justify-center min-h-screen">
+        <div class="text-center max-w-md mx-auto px-4">
+          <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <h1 class="text-2xl font-bold text-black mb-2 tracking-wide uppercase">ERROR EN EL PAGO</h1>
+          <p id="error-message" class="text-gray-600 mb-6 font-medium">Hubo un problema procesando tu pago.</p>
+          <div class="space-y-3">
+            <button id="retry-button" class="block w-full bg-black text-white px-6 py-3 rounded-lg font-bold hover:bg-gray-800 transition-colors tracking-wide uppercase">
+              Intentar Nuevamente
+            </button>
+            <a href="/checkout" class="block w-full border-2 border-black text-black px-6 py-3 rounded-lg font-bold hover:bg-black hover:text-white transition-colors tracking-wide uppercase">
+              Volver al Checkout
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>
+
+<script>
+  import { capturePayPalPayment } from '../../scripts/payment-methods';
+  
+  document.addEventListener('DOMContentLoaded', async function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderId = urlParams.get('order');
+    const token = urlParams.get('token'); // PayPal order ID
+    const paymentId = urlParams.get('PayerID');
+
+    const processingEl = document.getElementById('processing');
+    const successEl = document.getElementById('success');
+    const errorEl = document.getElementById('error');
+    const errorMessageEl = document.getElementById('error-message');
+    const orderInfoEl = document.getElementById('order-info');
+
+    if (!orderId || !token) {
+      showError('Parámetros de pago inválidos');
+      return;
+    }
+
+    try {
+      // Capturar el pago de PayPal
+      const result = await capturePayPalPayment(token, orderId);
+
+      if (result.success) {
+        // Mostrar éxito
+        processingEl?.classList.add('hidden');
+        successEl?.classList.remove('hidden');
+
+        // Mostrar detalles del pedido
+        if (orderInfoEl && result.payment) {
+          orderInfoEl.innerHTML = `
+            <p class="text-sm text-gray-600 mb-1">
+              <span class="font-medium">Número de pedido:</span> #${orderId.slice(-8)}
+            </p>
+            <p class="text-sm text-gray-600 mb-1">
+              <span class="font-medium">Monto pagado:</span> $${result.payment.amount}
+            </p>
+            <p class="text-sm text-gray-600">
+              <span class="font-medium">Método:</span> PayPal
+            </p>
+          `;
+        }
+      } else {
+        throw new Error('Error procesando el pago');
+      }
+    } catch (error) {
+      console.error('Error capturing PayPal payment:', error);
+      showError(error instanceof Error ? error.message : 'Error procesando el pago');
+    }
+
+    function showError(message: string) {
+      processingEl?.classList.add('hidden');
+      errorEl?.classList.remove('hidden');
+      if (errorMessageEl) {
+        errorMessageEl.textContent = message;
+      }
+
+      const retryButton = document.getElementById('retry-button');
+      retryButton?.addEventListener('click', () => {
+        window.location.reload();
+      });
+    }
+  });
+</script>

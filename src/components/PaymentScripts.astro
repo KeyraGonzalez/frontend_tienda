@@ -1,0 +1,49 @@
+---
+// PaymentScripts.astro - Dynamic payment script loading
+import ENV from '../config/env.js';
+
+// Get PayPal configuration from environment
+const paypalConfig = {
+  clientId: ENV.PAYPAL.CLIENT_ID,
+  environment: ENV.PAYPAL.ENVIRONMENT,
+  sdkUrl: ENV.PAYPAL.getSDKUrl(),
+  isConfigured: ENV.PAYPAL.isConfigured()
+};
+
+// Log configuration in development
+if (ENV.isDevelopment()) {
+  console.log('🔧 PaymentScripts Configuration:', paypalConfig);
+}
+---
+
+<!-- Stripe JavaScript (always load) -->
+<script src="https://js.stripe.com/v3/"></script>
+
+<!-- PayPal JavaScript (conditional loading) -->
+{paypalConfig.isConfigured ? (
+  <script src={paypalConfig.sdkUrl}></script>
+) : (
+  <script>
+    console.warn('⚠️ PayPal SDK not loaded - CLIENT_ID not configured');
+    console.log('💡 Add PUBLIC_PAYPAL_CLIENT_ID to your .env file to enable PayPal');
+  </script>
+)}
+
+<!-- Payment configuration logging (development only) -->
+{ENV.isDevelopment() && (
+  <script define:vars={{ paypalConfig }}>
+    console.group('🔧 Payment Scripts Loaded');
+    console.log('Stripe SDK: ✅ Loaded');
+    console.log(`PayPal SDK: ${paypalConfig.isConfigured ? '✅ Loaded' : '❌ Not configured'}`);
+    if (paypalConfig.isConfigured) {
+      console.log('PayPal Client ID:', paypalConfig.clientId);
+      console.log('PayPal Environment:', paypalConfig.environment);
+      console.log('PayPal SDK URL:', paypalConfig.sdkUrl);
+    }
+    console.groupEnd();
+  </script>
+)}
+
+<style>
+  /* No styles needed for script tags */
+</style>

@@ -1,0 +1,181 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout 
+  title="Verificar Email - StyleHub"
+  description="Verifica tu dirección de correo electrónico para completar tu registro en StyleHub."
+>
+  <main class="min-h-screen flex">
+    <div class="flex w-full min-h-screen">
+      <!-- Left Panel - Branding/Visual -->
+      <div class="hidden lg:flex lg:w-1/2 bg-black p-12 flex-col justify-center items-center text-white relative overflow-hidden">
+        <!-- Decorative elements -->
+        <div class="absolute top-0 left-0 w-full h-full opacity-10">
+          <div class="absolute top-20 left-10 w-32 h-32 bg-white rounded-full"></div>
+          <div class="absolute bottom-20 right-10 w-24 h-24 bg-white rounded-full"></div>
+          <div class="absolute top-1/2 left-1/4 w-16 h-16 bg-white rounded-full"></div>
+          <div class="absolute top-32 right-1/4 w-20 h-20 bg-white rounded-full"></div>
+        </div>
+        
+        <div class="relative z-10 text-center">
+          <div class="mb-8">
+            <div class="w-24 h-24 bg-white rounded-2xl flex items-center justify-center mb-6 mx-auto shadow-xl">
+              <svg class="w-12 h-12 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h1 class="text-5xl font-bold mb-4 tracking-wide uppercase text-white">VERIFICA TU EMAIL</h1>
+            <p class="text-xl opacity-90 mb-8 font-medium text-gray-300">Solo un paso más para completar tu registro</p>
+          </div>
+          
+          <div class="space-y-4 text-left max-w-sm">
+            <div class="flex items-center space-x-4">
+              <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <span class="text-lg font-medium text-white">Código enviado a tu email</span>
+            </div>
+            <div class="flex items-center space-x-4">
+              <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <span class="text-lg font-medium text-white">Válido por 15 minutos</span>
+            </div>
+            <div class="flex items-center space-x-4">
+              <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <span class="text-lg font-medium text-white">Revisá tu bandeja de spam</span>
+            </div>
+            <div class="flex items-center space-x-4">
+              <div class="w-10 h-10 bg-white bg-opacity-20 rounded-full flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <span class="text-lg font-medium text-white">Soporte si necesitas ayuda</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Panel - Verification Form -->
+      <div class="w-full lg:w-1/2 p-8 lg:p-12 flex flex-col justify-center bg-white min-h-screen">
+        <div class="max-w-md mx-auto w-full">
+          <!-- Header -->
+          <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold text-black mb-2 tracking-wide uppercase">VERIFICAR EMAIL</h2>
+            <p class="text-gray-600 font-medium">Ingresa el código de 6 dígitos que enviamos a tu email</p>
+            <p id="emailDisplay" class="text-sm text-gray-500 mt-2 font-mono"></p>
+          </div>
+
+          <!-- Verification Form -->
+          <form id="verify-form" class="space-y-6">
+            <!-- Error/Success Messages -->
+            <div id="verifyMessages" class="hidden">
+              <div id="verifyError" class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm hidden">
+              </div>
+              <div id="verifySuccess" class="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg text-sm hidden">
+              </div>
+            </div>
+
+            <!-- Email Field (Hidden, will be populated from URL) -->
+            <input type="hidden" id="email" name="email" />
+
+            <!-- Verification Code Field -->
+            <div>
+              <label for="verificationCode" class="block text-sm font-bold text-black mb-2 tracking-wide uppercase">
+                CÓDIGO DE VERIFICACIÓN
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <input
+                  type="text"
+                  id="verificationCode"
+                  name="verificationCode"
+                  required
+                  maxlength="6"
+                  placeholder="123456"
+                  class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent font-mono text-center text-lg tracking-widest font-bold"
+                />
+              </div>
+              <p class="text-xs text-gray-500 mt-1">Código de 6 dígitos enviado a tu email</p>
+            </div>
+
+            <!-- Submit Button -->
+            <button
+              type="submit"
+              id="submitBtn"
+              class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 shadow-lg tracking-wide uppercase"
+            >
+              <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                <svg class="h-5 w-5 text-gray-300 group-hover:text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </span>
+              <span id="submitText" class="tracking-wide uppercase font-bold">VERIFICAR CÓDIGO</span>
+              <span id="submitLoader" class="hidden tracking-wide uppercase font-bold">
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                VERIFICANDO...
+              </span>
+            </button>
+
+            <!-- Resend Code -->
+            <div class="text-center">
+              <p class="text-sm text-gray-600 mb-2">¿No recibiste el código?</p>
+              <button
+                type="button"
+                id="resendBtn"
+                class="text-black font-bold hover:text-gray-600 transition duration-200 text-sm tracking-wide uppercase"
+              >
+                REENVIAR CÓDIGO
+              </button>
+              <p id="resendTimer" class="text-xs text-gray-500 mt-1 hidden">
+                Podrás reenviar en <span id="countdown">120</span> segundos
+              </p>
+            </div>
+          </form>
+
+          <!-- Back to Login -->
+          <div class="text-center mt-8">
+            <p class="text-sm text-black font-medium">
+              ¿Ya tienes tu código verificado?
+              <a href="/login" class="font-bold text-black hover:text-gray-600 transition duration-200 tracking-wide uppercase">
+                INICIAR SESIÓN
+              </a>
+            </p>
+          </div>
+
+          <!-- Back to home -->
+          <div class="text-center mt-6">
+            <a href="/" class="text-sm text-gray-600 hover:text-black transition duration-200 font-medium">
+              ← Volver al inicio
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  import { initializeVerifyEmailPage } from '../scripts/auth/verify-email';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    initializeVerifyEmailPage();
+  });
+</script>

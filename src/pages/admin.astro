@@ -1,0 +1,675 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout 
+  title="Panel de Administración - StyleHub"
+  description="Panel de control completo para administradores de StyleHub."
+>  
+  <main class="min-h-screen bg-white">
+    <!-- Loading State -->
+    <div id="loading" class="flex items-center justify-center min-h-screen">
+      <div class="text-center">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
+        <p class="mt-2 text-black font-medium tracking-wide">Cargando panel de administración...</p>
+      </div>
+    </div>
+
+    <!-- Access Denied -->
+    <div id="access-denied" class="hidden flex items-center justify-center min-h-screen">
+      <div class="text-center max-w-md mx-auto px-4">
+        <div class="w-16 h-16 bg-white border-2 border-black rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          </svg>
+        </div>
+        <h1 class="text-2xl font-bold text-black mb-2 tracking-wide uppercase">Acceso Denegado</h1>
+        <p class="text-gray-600 mb-6">No tienes permisos de administrador para acceder a esta página.</p>
+        <a href="/" class="bg-black text-white px-6 py-2 rounded-lg font-bold hover:bg-gray-800 transition-colors tracking-wide uppercase">
+          Volver al inicio
+        </a>
+      </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="admin-panel" class="hidden">
+      <!-- Header del admin -->
+      <div class="bg-black text-white border-b-2 border-black">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex items-center justify-between h-20">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <h1 class="text-2xl font-bold tracking-wide uppercase">Panel de Administración</h1>
+                <p class="text-gray-300 text-sm tracking-wide">Gestiona tu e-commerce desde aquí</p>
+              </div>
+            </div>
+            <div class="flex items-center space-x-4">
+              <div class="text-right">
+                <p class="text-sm font-bold tracking-wide" id="admin-name">Administrador</p>
+                <p class="text-xs text-gray-300 tracking-wide" id="last-login">Último acceso: Hoy</p>
+              </div>
+              <div class="w-10 h-10 bg-white border-2 border-gray-300 rounded-full flex items-center justify-center">
+                <span class="text-sm font-bold text-black" id="admin-initials">A</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="bg-white border-b-2 border-black sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <nav class="flex space-x-8">
+            <button class="admin-tab active border-b-2 border-black py-4 px-1 text-sm font-bold text-black tracking-wide uppercase" data-tab="dashboard">
+              <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              Dashboard
+            </button>
+            <button class="admin-tab border-b-2 border-transparent py-4 px-1 text-sm font-bold text-gray-600 hover:text-black hover:border-gray-400 tracking-wide uppercase" data-tab="products">
+              <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              </svg>
+              Productos
+            </button>
+            <button class="admin-tab border-b-2 border-transparent py-4 px-1 text-sm font-bold text-gray-600 hover:text-black hover:border-gray-400 tracking-wide uppercase" data-tab="categories">
+              <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+              </svg>
+              Categorías
+            </button>
+            <button class="admin-tab border-b-2 border-transparent py-4 px-1 text-sm font-bold text-gray-600 hover:text-black hover:border-gray-400 tracking-wide uppercase" data-tab="orders">
+              <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+              Órdenes
+            </button>
+            <button class="admin-tab border-b-2 border-transparent py-4 px-1 text-sm font-bold text-gray-600 hover:text-black hover:border-gray-400 tracking-wide uppercase" data-tab="users">
+              <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+              </svg>
+              Usuarios
+            </button>
+            <button class="admin-tab border-b-2 border-transparent py-4 px-1 text-sm font-bold text-gray-600 hover:text-black hover:border-gray-400 tracking-wide uppercase" data-tab="payments">
+              <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+              </svg>
+              Pagos
+            </button>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Content Container -->
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Dashboard Tab -->
+        <div id="dashboard-content" class="tab-content">
+          <!-- Quick Stats -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-sm p-6 border-2 border-black hover:shadow-md transition-shadow">
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <div class="w-12 h-12 bg-black rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+                    </svg>
+                  </div>
+                </div>
+                <div class="ml-4 flex-1">
+                  <p class="text-sm font-bold text-black tracking-wide uppercase">Usuarios Totales</p>
+                  <div class="flex items-baseline">
+                    <p class="text-2xl font-bold text-black" id="total-users">-</p>
+                    <p class="ml-2 text-sm font-bold text-black" id="users-growth">+0%</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm p-6 border-2 border-black hover:shadow-md transition-shadow">
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <div class="w-12 h-12 bg-black rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                  </div>
+                </div>
+                <div class="ml-4 flex-1">
+                  <p class="text-sm font-bold text-black tracking-wide uppercase">Órdenes Totales</p>
+                  <div class="flex items-baseline">
+                    <p class="text-2xl font-bold text-black" id="total-orders">-</p>
+                    <p class="ml-2 text-sm font-bold text-black" id="orders-growth">+0%</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm p-6 border-2 border-black hover:shadow-md transition-shadow">
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <div class="w-12 h-12 bg-black rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                  </div>
+                </div>
+                <div class="ml-4 flex-1">
+                  <p class="text-sm font-bold text-black tracking-wide uppercase">Productos Totales</p>
+                  <div class="flex items-baseline">
+                    <p class="text-2xl font-bold text-black" id="total-products">-</p>
+                    <p class="ml-2 text-sm font-bold text-black" id="products-active">activos</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm p-6 border-2 border-black hover:shadow-md transition-shadow">
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <div class="w-12 h-12 bg-black rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                    </svg>
+                  </div>
+                </div>
+                <div class="ml-4 flex-1">
+                  <p class="text-sm font-bold text-black tracking-wide uppercase">Ingresos Totales</p>
+                  <div class="flex items-baseline">
+                    <p class="text-2xl font-bold text-black" id="total-revenue">$0</p>
+                    <p class="ml-2 text-sm font-bold text-black" id="revenue-growth">+0%</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Activity & Charts -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Recent Orders -->
+            <div class="bg-white rounded-lg shadow-sm border-2 border-black">
+              <div class="p-6 border-b-2 border-black">
+                <h3 class="text-lg font-bold text-black tracking-wide uppercase">Órdenes Recientes</h3>
+              </div>
+              <div class="p-6">
+                <div id="recent-orders" class="space-y-4">
+                  <div class="text-center text-black py-8">
+                    <svg class="w-12 h-12 mx-auto mb-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                    <p class="font-medium tracking-wide">Cargando órdenes recientes...</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Top Products -->
+            <div class="bg-white rounded-xl shadow-sm border border-neutral-200">
+              <div class="p-6 border-b border-neutral-200">
+                <h3 class="text-lg font-semibold text-neutral-900">Productos Más Vendidos</h3>
+              </div>
+              <div class="p-6">
+                <div id="top-products" class="space-y-4">
+                  <div class="text-center text-neutral-500 py-8">
+                    <svg class="w-12 h-12 mx-auto mb-4 text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                    <p>Cargando productos populares...</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- System Status -->
+          <div class="bg-white rounded-xl shadow-sm border border-neutral-200">
+            <div class="p-6 border-b border-neutral-200">
+              <h3 class="text-lg font-semibold text-neutral-900">Estado del Sistema</h3>
+            </div>
+            <div class="p-6">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="text-center">
+                  <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <p class="text-sm font-medium text-neutral-900">API Status</p>
+                  <p class="text-xs text-green-600">Funcionando</p>
+                </div>
+                <div class="text-center">
+                  <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+                    </svg>
+                  </div>
+                  <p class="text-sm font-medium text-neutral-900">Base de Datos</p>
+                  <p class="text-xs text-green-600">Conectada</p>
+                </div>
+                <div class="text-center">
+                  <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                    </svg>
+                  </div>
+                  <p class="text-sm font-medium text-neutral-900">Almacenamiento</p>
+                  <p class="text-xs text-green-600">85% libre</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Products Tab -->
+        <div id="products-content" class="tab-content hidden">
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-neutral-900">Gestión de Productos</h2>
+            <button id="add-product-btn" class="bg-primary-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-primary-700 transition-colors">
+              <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Añadir Producto
+            </button>
+          </div>
+
+          <!-- Products Filter -->
+          <div class="bg-white rounded-lg shadow-sm border border-neutral-200 p-4 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-neutral-700 mb-1">Buscar</label>
+                <input type="text" id="products-search" placeholder="Nombre, SKU..." class="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-neutral-700 mb-1">Categoría</label>
+                <select id="products-category" class="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                  <option value="">Todas las categorías</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-neutral-700 mb-1">Estado</label>
+                <select id="products-status" class="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                  <option value="">Todos</option>
+                  <option value="true">Activo</option>
+                  <option value="false">Inactivo</option>
+                </select>
+              </div>
+              <div class="flex items-end">
+                <button id="products-filter-btn" class="w-full bg-neutral-600 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 transition-colors">
+                  Filtrar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Products Table -->
+          <div class="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-neutral-200">
+                <thead class="bg-neutral-50">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Producto</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">SKU</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Precio</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Stock</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Estado</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="products-table-body" class="bg-white divide-y divide-neutral-200">
+                  <tr>
+                    <td colspan="6" class="px-6 py-4 text-center text-neutral-500">
+                      Cargando productos...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="bg-white px-4 py-3 border-t border-neutral-200 sm:px-6">
+              <div id="products-pagination" class="flex items-center justify-between">
+                <div class="text-sm text-neutral-700">Mostrando productos</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Categories Tab -->
+        <div id="categories-content" class="tab-content hidden">
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-black tracking-wide uppercase">Gestión de Categorías</h2>
+            <button id="add-category-btn" class="bg-black text-white px-4 py-2 rounded-lg font-bold hover:bg-gray-800 transition-colors tracking-wide uppercase">
+              <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Añadir Categoría
+            </button>
+          </div>
+
+          <!-- Categories Filter -->
+          <div class="bg-white rounded-lg shadow-sm border-2 border-black p-4 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-sm font-bold text-black mb-1 tracking-wide uppercase">Buscar</label>
+                <input type="text" id="categories-search" placeholder="Nombre de categoría..." class="w-full px-3 py-2 border-2 border-black rounded-lg focus:ring-2 focus:ring-black focus:border-black">
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-black mb-1 tracking-wide uppercase">Estado</label>
+                <select id="categories-status" class="w-full px-3 py-2 border-2 border-black rounded-lg focus:ring-2 focus:ring-black focus:border-black">
+                  <option value="">Todos</option>
+                  <option value="true">Activo</option>
+                  <option value="false">Inactivo</option>
+                </select>
+              </div>
+              <div class="flex items-end">
+                <button id="categories-filter-btn" class="w-full bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors font-bold tracking-wide uppercase">
+                  Filtrar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Categories Table -->
+          <div class="bg-white rounded-lg shadow-sm border-2 border-black overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Nombre</th>
+                    <th class="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Descripción</th>
+                    <th class="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Productos</th>
+                    <th class="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Estado</th>
+                    <th class="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Creada</th>
+                    <th class="px-6 py-3 text-left text-xs font-bold text-black uppercase tracking-wider">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="categories-table-body" class="bg-white divide-y divide-gray-200">
+                  <tr>
+                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                      Cargando categorías...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+              <div id="categories-pagination" class="flex items-center justify-between">
+                <div class="text-sm text-gray-700">Mostrando categorías</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Orders Tab -->
+        <div id="orders-content" class="tab-content hidden">
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-neutral-900">Gestión de Órdenes</h2>
+            <div class="flex space-x-2">
+              <button id="export-orders-btn" class="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 transition-colors">
+                <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Exportar
+              </button>
+            </div>
+          </div>
+
+          <!-- Orders Filter -->
+          <div class="bg-white rounded-lg shadow-sm border border-neutral-200 p-4 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-neutral-700 mb-1">Buscar</label>
+                <input type="text" id="orders-search" placeholder="ID, usuario..." class="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-neutral-700 mb-1">Estado</label>
+                <select id="orders-status" class="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                  <option value="">Todos</option>
+                  <option value="pending">Pendiente</option>
+                  <option value="processing">Procesando</option>
+                  <option value="shipped">Enviado</option>
+                  <option value="delivered">Entregado</option>
+                  <option value="cancelled">Cancelado</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-neutral-700 mb-1">Fecha desde</label>
+                <input type="date" id="orders-date-from" class="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-neutral-700 mb-1">Fecha hasta</label>
+                <input type="date" id="orders-date-to" class="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+              </div>
+              <div class="flex items-end">
+                <button id="orders-filter-btn" class="w-full bg-neutral-600 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 transition-colors">
+                  Filtrar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Orders Table -->
+          <div class="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-neutral-200">
+                <thead class="bg-neutral-50">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">ID</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Cliente</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Total</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Estado</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Fecha</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="orders-table-body" class="bg-white divide-y divide-neutral-200">
+                  <tr>
+                    <td colspan="6" class="px-6 py-4 text-center text-neutral-500">
+                      Cargando órdenes...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="bg-white px-4 py-3 border-t border-neutral-200 sm:px-6">
+              <div id="orders-pagination" class="flex items-center justify-between">
+                <div class="text-sm text-neutral-700">Mostrando órdenes</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Users Tab -->
+        <div id="users-content" class="tab-content hidden">
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-neutral-900">Gestión de Usuarios</h2>
+            <button id="add-user-btn" class="bg-primary-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-primary-700 transition-colors">
+              <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Añadir Usuario
+            </button>
+          </div>
+
+          <!-- Users Filter -->
+          <div class="bg-white rounded-lg shadow-sm border border-neutral-200 p-4 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-neutral-700 mb-1">Buscar</label>
+                <input type="text" id="users-search" placeholder="Nombre, email..." class="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-neutral-700 mb-1">Rol</label>
+                <select id="users-role" class="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                  <option value="">Todos</option>
+                  <option value="cliente">Cliente</option>
+                  <option value="admin">Administrador</option>
+                  <option value="moderador">Moderador</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-neutral-700 mb-1">Estado</label>
+                <select id="users-status" class="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                  <option value="">Todos</option>
+                  <option value="true">Activo</option>
+                  <option value="false">Inactivo</option>
+                </select>
+              </div>
+              <div class="flex items-end">
+                <button id="users-filter-btn" class="w-full bg-neutral-600 text-white px-4 py-2 rounded-lg hover:bg-neutral-700 transition-colors">
+                  Filtrar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Users Table -->
+          <div class="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-neutral-200">
+                <thead class="bg-neutral-50">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Usuario</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Email</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Rol</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Estado</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Registro</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="users-table-body" class="bg-white divide-y divide-neutral-200">
+                  <tr>
+                    <td colspan="6" class="px-6 py-4 text-center text-neutral-500">
+                      Cargando usuarios...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="bg-white px-4 py-3 border-t border-neutral-200 sm:px-6">
+              <div id="users-pagination" class="flex items-center justify-between">
+                <div class="text-sm text-neutral-700">Mostrando usuarios</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payments Tab -->
+        <div id="payments-content" class="tab-content hidden">
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-black tracking-wide uppercase">Gestión de Pagos</h2>
+            <a href="/admin/pagos" class="bg-black text-white px-6 py-3 rounded-lg font-bold hover:bg-gray-800 transition-colors tracking-wide uppercase">
+              <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2M7 7h10M7 7v10" />
+              </svg>
+              Ver Panel Completo
+            </a>
+          </div>
+
+          <!-- Quick Overview -->
+          <div class="bg-white rounded-lg shadow-sm border-2 border-black p-8">
+            <div class="text-center">
+              <svg class="w-16 h-16 mx-auto mb-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+              </svg>
+              <h3 class="text-xl font-bold text-black mb-4 tracking-wide uppercase">Panel de Pagos Completo</h3>
+              <p class="text-gray-600 mb-6">Gestiona todos los pagos de tu tienda desde un panel dedicado con funcionalidades avanzadas.</p>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                  <h4 class="font-bold text-black mb-2 uppercase">Funcionalidades</h4>
+                  <ul class="text-sm text-gray-600 text-left space-y-1">
+                    <li>✓ Estadísticas en tiempo real</li>
+                    <li>✓ Filtros avanzados de búsqueda</li>
+                    <li>✓ Procesamiento de reembolsos</li>
+                    <li>✓ Exportación de datos</li>
+                    <li>✓ Gestión de pagos pendientes</li>
+                  </ul>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                  <h4 class="font-bold text-black mb-2 uppercase">Información</h4>
+                  <ul class="text-sm text-gray-600 text-left space-y-1">
+                    <li>• Pagos de Stripe y PayPal</li>
+                    <li>• Detalles completos de transacciones</li>
+                    <li>• Estados de pago en tiempo real</li>
+                    <li>• Historial completo</li>
+                    <li>• Panel administrativo dedicado</li>
+                  </ul>
+                </div>
+              </div>
+
+              <a href="/admin/pagos" class="bg-black text-white px-8 py-4 rounded-lg font-bold hover:bg-gray-800 transition-colors tracking-wide uppercase text-lg inline-flex items-center">
+                <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+                Acceder al Panel de Pagos
+              </a>
+            </div>
+          </div>
+        </div>
+                  </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category Modal -->
+    <div id="category-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+      <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+        
+        <div class="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-bold text-black tracking-wide uppercase" id="category-modal-title">Añadir Categoría</h3>
+            <button id="close-category-modal" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+          
+          <form id="category-form">
+            <input type="hidden" id="category-id" name="id">
+            
+            <div class="space-y-4">
+              <div>
+                <label for="category-name" class="block text-sm font-bold text-black mb-1 tracking-wide uppercase">Nombre *</label>
+                <input type="text" id="category-name" name="name" required class="w-full px-3 py-2 border-2 border-black rounded-lg focus:ring-2 focus:ring-black focus:border-black" placeholder="Nombre de la categoría">
+              </div>
+              
+              <div>
+                <label for="category-description" class="block text-sm font-bold text-black mb-1 tracking-wide uppercase">Descripción</label>
+                <textarea id="category-description" name="description" rows="3" class="w-full px-3 py-2 border-2 border-black rounded-lg focus:ring-2 focus:ring-black focus:border-black" placeholder="Descripción de la categoría"></textarea>
+              </div>
+              
+              <div>
+                <label for="category-image-url" class="block text-sm font-bold text-black mb-1 tracking-wide uppercase">URL de Imagen</label>
+                <input type="url" id="category-image-url" name="image_url" class="w-full px-3 py-2 border-2 border-black rounded-lg focus:ring-2 focus:ring-black focus:border-black" placeholder="https://ejemplo.com/imagen.jpg">
+              </div>
+              
+              <div class="flex items-center">
+                <input type="checkbox" id="category-active" name="is_active" class="rounded border-black text-black focus:ring-black" checked>
+                <label for="category-active" class="ml-2 text-sm font-bold text-black tracking-wide uppercase">Categoría Activa</label>
+              </div>
+            </div>
+            
+            <div class="mt-6 flex space-x-3">
+              <button type="button" id="cancel-category" class="flex-1 bg-gray-100 text-black py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors text-sm font-bold border-2 border-black tracking-wide uppercase">
+                Cancelar
+              </button>
+              <button type="submit" class="flex-1 bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800 transition-colors text-sm font-bold tracking-wide uppercase">
+                Guardar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>  <!-- Modals will be inserted here by JavaScript -->
+
+</Layout>
+
+<script>
+  import { initializeAdminPanel } from '../scripts/admin/admin-panel';
+  
+  document.addEventListener('DOMContentLoaded', async function() {
+    await initializeAdminPanel();
+  });
+</script>
