@@ -82,14 +82,13 @@ export default function CheckoutSuccessContent() {
         const orderResponse = await ordersApi.getById(token, orderId);
         setOrderDetails(orderResponse);
 
-        // Obtener detalles del pago si hay paymentId
-        if (paymentId) {
-          try {
-            const paymentResponse = await paymentsApi.getById(token, paymentId);
-            setPaymentDetails(paymentResponse);
-          } catch (paymentError) {
-            console.error('Error al obtener detalles del pago:', paymentError);
-          }
+        // Obtener detalles del pago usando el orderId
+        try {
+          const paymentResponse = await paymentsApi.getPaymentByOrder(token, orderId);
+          setPaymentDetails(paymentResponse);
+        } catch (paymentError) {
+          console.error('Error al obtener detalles del pago:', paymentError);
+          // No es crítico si no se pueden obtener los detalles del pago
         }
 
         // Limpiar el carrito después de una compra exitosa
