@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -553,3 +555,4 @@ export default function CheckoutSuccessPage() {
     </div>
   );
 }
+
