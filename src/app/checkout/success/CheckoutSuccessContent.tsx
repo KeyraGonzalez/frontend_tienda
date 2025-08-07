@@ -84,7 +84,10 @@ export default function CheckoutSuccessContent() {
 
         // Obtener detalles del pago usando el orderId
         try {
-          const paymentResponse = await paymentsApi.getPaymentByOrder(token, orderId);
+          const paymentResponse = await paymentsApi.getPaymentByOrder(
+            token,
+            orderId
+          );
           setPaymentDetails(paymentResponse);
         } catch (paymentError) {
           console.error('Error al obtener detalles del pago:', paymentError);
