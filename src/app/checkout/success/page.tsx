@@ -22,6 +22,8 @@ import { Suspense } from 'react';
 
 // Forzar renderizado dinámico
 export const dynamic = 'force-dynamic';
+export const dynamicParams = true;
+export const revalidate = 0;
 
 interface OrderDetails {
   _id: string;
@@ -56,8 +58,16 @@ function CheckoutSuccessPageContent() {
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  // Asegurar que el componente esté montado antes de acceder a searchParams
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
+    if (!mounted) return;
+
     const fetchOrderAndPaymentDetails = async () => {
       try {
         const orderId = searchParams.get('orderId');
@@ -100,7 +110,15 @@ function CheckoutSuccessPageContent() {
     };
 
     fetchOrderAndPaymentDetails();
-  }, [searchParams, clearCart, token, router]);
+  }, [mounted, searchParams, clearCart, token, router]);
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
